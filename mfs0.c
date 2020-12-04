@@ -155,13 +155,13 @@ int main()
                   fread(&BPB_BytesPerSec, 2, 1, fp);
 
                   fseek(fp, 13, SEEK_SET);
-                  fread(&BPB_SecPerClus, 2, 1, fp);
+                  fread(&BPB_SecPerClus, 1, 1, fp);
 
                   fseek(fp, 14, SEEK_SET);
-                  fread(&BPB_RsvdSecCnt, 1, 2, fp);
+                  fread(&BPB_RsvdSecCnt, 2, 1, fp);
 
                   fseek(fp, 16, SEEK_SET);
-                  fread(&BPB_NumFATS, 2, 1, fp);
+                  fread(&BPB_NumFATS, 1, 1, fp);
 
                   fseek(fp, 36, SEEK_SET);
                   fread(&BPB_FATSz32, 4, 1, fp);
