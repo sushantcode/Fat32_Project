@@ -195,6 +195,20 @@ int main()
             }
         }
 
+     
+    else if (strcmp("bpb", token[0]) == 0)
+    {
+          
+            printf("BPB_BytesPerSec : %d\nBPB_BytesPerSec : %x\n\n", BPB_BytesPerSec, BPB_BytesPerSec);
+            printf("BPB_SecPerClus : %d\nBPB_SecPerClus : %x\n\n", BPB_SecPerClus, BPB_SecPerClus);
+            printf("BPB_RsvdSecCnt : %d\nBPB_RsvdSecCnt : %x\n\n", BPB_RsvdSecCnt, BPB_RsvdSecCnt);
+            printf("BPB_NumFATS : %d\nBPB_NumFATS : %x\n\n", BPB_NumFATS, BPB_NumFATS);
+            printf("BPB_FATSz32 : %d\nBPB_FATSz32 : %x\n\n", BPB_FATSz32, BPB_FATSz32); 
+
+    }
+    
+
+
   }
   return 0;
 }
