@@ -30,6 +30,7 @@
 #include <string.h>
 #include <signal.h>
 #include <stdint.h>
+#include <ctype.h>
 #include <stdbool.h>
 
 #define MAX_NUM_ARGUMENTS 3
@@ -83,6 +84,58 @@ int LBAToOffset(int32_t sector)
 {
     return ((sector - 2) * BPB_BytesPerSec) + (BPB_BytesPerSec * BPB_RsvdSecCnt) + (BPB_NumFATS * BPB_FATSz32 * BPB_BytesPerSec);
 }
+
+int compare(char *user, char *directory)
+{
+  char *spacing ="..";
+  if(strncmp(spacing,user,2)==0)
+  {
+
+    if(strncmp(user,directory,2)==0)
+    {
+      return 1;
+    }
+    return 0;
+
+   }
+
+  char IMG_Name[12];
+  strncpy(IMG_Name,directory,11);
+  IMG_Name[11]='\0';
+  char input[11];
+  memset(input,0,11);
+  strncpy(input,user,strlen(user));
+  char expanded_name[12];
+  memset(expanded_name,' ',12);
+  char *token = strtok(input,".");
+  strncpy(expanded_name,token,strlen(token));
+  token= strtok(NULL,".");
+
+  if(token)
+  {
+    strncpy((char*)(expanded_name+8), token, strlen(token));
+  }
+ int i;
+
+ for(i=0; i<11; i++)
+ {
+  expanded_name[i]=toupper(expanded_name[i]);
+
+
+ }
+ if(strncmp(expanded_name,IMG_Name,11)==0)
+ {
+   return 1;
+
+
+ }
+
+return 0;
+
+}
+
+
+
 
 int main()
 {
@@ -202,7 +255,7 @@ int main()
         }
 
      
-        else if (strcmp("info", token[0]) == 0)
+        else if (strcmp("bpb", token[0]) == 0)
             {
             if(fp==NULL)
             {
@@ -271,7 +324,7 @@ int main()
     
   }
 
-  else if (strcmp("stat", token[0]) == 0)
+  else if (strcmp("cd", token[0]) == 0)
     {
         if(fp==NULL)
       {
@@ -282,26 +335,47 @@ int main()
     if(fp != NULL)
 
     {
-     
       
-  
+      int i;
+      int got =0;
+      
+    for (i = 0; i < 16; i++)
+    {
+      if(compare(token[1], Dir[i].DIR_Name))
+      {
+
+        int cluster = Dir[i].DIR_FirstClusterLow;
+        if(cluster ==0)
+        {
+
+          cluster =2;
+        }
+        
+        int offset = LBAToOffset(cluster);
+        fseek(fp,offset,SEEK_SET);
+        fread(Dir, sizeof(struct DirectoryEntry),16,fp);
+        got=1;
+        break;
+
+
+      }
+      
 
 
 
     }
 
+
+    if(!got)
+    {
+      printf("Error: Directory not found\n");
+      
+    }
+       
     }
 
-
-
-
-
-
-
-
-
-
-      
+    }
+   
   }
   
   return 0;
