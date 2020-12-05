@@ -56,14 +56,19 @@ struct __attribute__((__packed__)) DirectoryEntry
 };
 
 struct DirectoryEntry Dir[16];
-
+  
+  #define ATTR_READ_ONLY 0x01
+  #define ATTR_HIDDEN 0x01
+  #define ATTR_SYSTEM 0x04
+  #define ATTR_DIRECTORY 0x10
+  #define ATTR_ARCHIVE 0x20
 
   uint16_t BPB_BytesPerSec;
   uint8_t BPB_SecPerClus;
   uint16_t BPB_RsvdSecCnt;
   uint8_t BPB_NumFATS;
   uint32_t BPB_FATSz32;
-
+  int32_t currDirectory;
 
 int16_t NextLB(uint32_t sector)
 {
@@ -72,6 +77,11 @@ int16_t NextLB(uint32_t sector)
   fseek(fp, FATAddress, SEEK_SET);
   fread(&val, 2, 1, fp);
   return val;
+}
+
+int LBAToOffset(int32_t sector)
+{
+    return ((sector - 2) * BPB_BytesPerSec) + (BPB_BytesPerSec * BPB_RsvdSecCnt) + (BPB_NumFATS * BPB_FATSz32 * BPB_BytesPerSec);
 }
 
 int main()
@@ -148,9 +158,7 @@ int main()
                  printf("Error: File system image not found.\n");
                  continue;
               }
-
-              
-                
+  
                   fseek(fp, 11, SEEK_SET);
                   fread(&BPB_BytesPerSec, 2, 1, fp);
 
@@ -165,6 +173,13 @@ int main()
 
                   fseek(fp, 36, SEEK_SET);
                   fread(&BPB_FATSz32, 4, 1, fp);  
+
+                  int root = (BPB_RsvdSecCnt+BPB_BytesPerSec) + (BPB_NumFATS*BPB_FATSz32*BPB_BytesPerSec);
+                  
+                  fseek(fp,root,SEEK_SET);
+
+                  fread(Dir,sizeof(struct DirectoryEntry),16,fp);
+                  printf("%x\n",root);
                  
             }
 		}
@@ -197,27 +212,54 @@ int main()
             {
 
             printf("BPB_BytesPerSec(Decimal): %d\n", BPB_BytesPerSec);
-            printf("BPB_BytesPerSec(HexaDecimal): %x\n", BPB_BytesPerSec);
+            printf("BPB_BytesPerSec(HexaDecimal): 0x%x\n", BPB_BytesPerSec);
 
             printf("BPB_SecPerClus(Decimal): %d\n", BPB_SecPerClus);
-            printf("BPB_SecPerClus (HexaDecimal): %x\n", BPB_SecPerClus);
+            printf("BPB_SecPerClus (HexaDecimal): 0x%x\n", BPB_SecPerClus);
 
             printf("BPB_RsvdSecCnt (Decimal): %d\n", BPB_RsvdSecCnt);
-            printf("BPB_RsvdSecCnt (HexaDecimal): %x\n", BPB_RsvdSecCnt);
+            printf("BPB_RsvdSecCnt (HexaDecimal): 0x%x\n", BPB_RsvdSecCnt);
 
             printf("BPB_NumFATS (Decimal): %d\n", BPB_NumFATS);
-            printf("BPB_NumFATS (HexaDecimal): %x\n", BPB_NumFATS);
+            printf("BPB_NumFATS (HexaDecimal): 0x%x\n", BPB_NumFATS);
 
             printf("BPB_FATSz32 (Decimal): %d\n", BPB_FATSz32);
-            printf("BPB_FATSz32 (HexaDecimal): %x\n", BPB_FATSz32);  
+            printf("BPB_FATSz32 (HexaDecimal): 0x%x\n", BPB_FATSz32);  
           
          
             }
 
     }
-    
 
+   else if (strcmp("ls", token[0]) == 0)
+    {
+
+    if(fp != NULL)
+
+    {
+      
+      int i;
+      
+      for (i = 0; i < 16; i++)
+      {
+
+          char filename[12];
+				  strncpy(filename, Dir[i].DIR_Name, 11);
+          //printf("%s\n" , Dir[i].DIR_Name);
+          filename[11]='\0';
+          if ((Dir[i].DIR_Attr == ATTR_READ_ONLY || Dir[i].DIR_Attr ==ATTR_DIRECTORY 
+          || Dir[i].DIR_Attr == ATTR_ARCHIVE) && filename[0] != 0xffffffe5)
+          {
+				  printf("%s\n", filename);
+           }
+
+        }
+    
+    }  
 
   }
+      
+  }
+  
   return 0;
 }
