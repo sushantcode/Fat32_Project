@@ -232,8 +232,14 @@ int main()
 
     }
 
-   else if (strcmp("ls", token[0]) == 0)
+  else if (strcmp("ls", token[0]) == 0)
     {
+
+      if(fp==NULL)
+      {
+        printf("Error: File System Image Not found\n");
+
+      }
 
     if(fp != NULL)
 
@@ -255,10 +261,46 @@ int main()
           }
 
         }
+
+      
+
+
     
     }  
 
+    
   }
+
+  else if (strcmp("stat", token[0]) == 0)
+    {
+        if(fp==NULL)
+      {
+        printf("Error: File System Image Not found\n");
+
+      }
+
+    if(fp != NULL)
+
+    {
+     
+      
+  
+
+
+
+    }
+
+    }
+
+
+
+
+
+
+
+
+
+
       
   }
   
