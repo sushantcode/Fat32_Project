@@ -174,12 +174,13 @@ int main()
                   fseek(fp, 36, SEEK_SET);
                   fread(&BPB_FATSz32, 4, 1, fp);  
 
-                  int root = (BPB_RsvdSecCnt+BPB_BytesPerSec) + (BPB_NumFATS*BPB_FATSz32*BPB_BytesPerSec);
-                  
-                  fseek(fp,root,SEEK_SET);
+                  int root = (BPB_RsvdSecCnt * BPB_BytesPerSec) + (BPB_NumFATS * BPB_FATSz32 * BPB_BytesPerSec);
+
+                 // fseek(fp,0x100400,SEEK_SET);
+                 fseek(fp,root,SEEK_SET);
 
                   fread(Dir,sizeof(struct DirectoryEntry),16,fp);
-                  printf("%x\n",root);
+                  //printf("%x\n",root);
                  
             }
 		}
@@ -201,8 +202,8 @@ int main()
         }
 
      
-    else if (strcmp("info", token[0]) == 0)
-    {
+        else if (strcmp("info", token[0]) == 0)
+            {
             if(fp==NULL)
             {
               printf("ERROR: File System image must be opened first \n");
@@ -250,8 +251,8 @@ int main()
           if ((Dir[i].DIR_Attr == ATTR_READ_ONLY || Dir[i].DIR_Attr ==ATTR_DIRECTORY 
           || Dir[i].DIR_Attr == ATTR_ARCHIVE) && filename[0] != 0xffffffe5)
           {
-				  printf("%s\n", filename);
-           }
+				  printf("%s\n", filename );
+          }
 
         }
     
@@ -263,3 +264,4 @@ int main()
   
   return 0;
 }
+
