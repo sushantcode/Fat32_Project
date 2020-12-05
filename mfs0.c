@@ -161,15 +161,10 @@ int main()
                   fread(&BPB_RsvdSecCnt, 2, 1, fp);
 
                   fseek(fp, 16, SEEK_SET);
-                  fread(&BPB_NumFATS, 1, 1, fp);
+                  fread(&BPB_NumFATS, 1, 2, fp);
 
                   fseek(fp, 36, SEEK_SET);
-                  fread(&BPB_FATSz32, 4, 1, fp);
-
-
-
-
-              
+                  fread(&BPB_FATSz32, 4, 1, fp);  
                  
             }
 		}
@@ -200,12 +195,23 @@ int main()
 
             else
             {
+
+            printf("BPB_BytesPerSec(Decimal): %d\n", BPB_BytesPerSec);
+            printf("BPB_BytesPerSec(HexaDecimal): %x\n", BPB_BytesPerSec);
+
+            printf("BPB_SecPerClus(Decimal): %d\n", BPB_SecPerClus);
+            printf("BPB_SecPerClus (HexaDecimal): %x\n", BPB_SecPerClus);
+
+            printf("BPB_RsvdSecCnt (Decimal): %d\n", BPB_RsvdSecCnt);
+            printf("BPB_RsvdSecCnt (HexaDecimal): %x\n", BPB_RsvdSecCnt);
+
+            printf("BPB_NumFATS (Decimal): %d\n", BPB_NumFATS);
+            printf("BPB_NumFATS (HexaDecimal): %x\n", BPB_NumFATS);
+
+            printf("BPB_FATSz32 (Decimal): %d\n", BPB_FATSz32);
+            printf("BPB_FATSz32 (HexaDecimal): %x\n", BPB_FATSz32);  
           
-            printf("BPB_BytesPerSec : %d\nBPB_BytesPerSec : %x\n\n", BPB_BytesPerSec, BPB_BytesPerSec);
-            printf("BPB_SecPerClus : %d\nBPB_SecPerClus : %x\n\n", BPB_SecPerClus, BPB_SecPerClus);
-            printf("BPB_RsvdSecCnt : %d\nBPB_RsvdSecCnt : %x\n\n", BPB_RsvdSecCnt, BPB_RsvdSecCnt);
-            printf("BPB_NumFATS : %d\nBPB_NumFATS : %x\n\n", BPB_NumFATS, BPB_NumFATS);
-            printf("BPB_FATSz32 : %d\nBPB_FATSz32 : %x\n\n", BPB_FATSz32, BPB_FATSz32); 
+         
             }
 
     }
