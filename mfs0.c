@@ -235,6 +235,96 @@ int readfile( char *filename, int requested_Offset, int requestedBytes)
       //return 0;
     }
 
+
+int getFile(char *olderfilename, char *newfilename)
+{
+
+  FILE *oldpointer;
+
+  if(newfilename == NULL)
+  {
+
+    oldpointer = fopen(olderfilename,"w");
+    if(oldpointer == NULL)
+    {
+     printf("Error: Cant open new file %s\n", olderfilename);
+
+    }
+
+  }
+
+  else
+  {
+
+   oldpointer = fopen(newfilename,"w");
+   if(oldpointer == NULL)
+    {
+     printf("Error: Cant open new file %s\n", newfilename);
+
+    }
+
+  }
+
+  int i;
+  int got=0;
+
+  for(i=0; i<16 ; i++)
+  {
+
+    if(compare(olderfilename, Dir[i].DIR_Name ) )
+        {
+          int cluster = Dir[i].DIR_FirstClusterLow;
+            got =1;
+
+            int byteremainingtoread = Dir[i].DIR_FileSize;
+            int offset=0;
+            unsigned char buffer[512];
+
+            while(byteremainingtoread >= BPB_BytesPerSec)
+            {
+              
+              offset = LBAToOffset(cluster);
+              fseek(fp, offset, SEEK_SET);
+              fread(buffer, 1, BPB_BytesPerSec,fp);
+              fwrite(buffer,1,512,oldpointer);
+
+              cluster = NextLB(cluster);
+              byteremainingtoread = byteremainingtoread - BPB_BytesPerSec;
+
+
+            }
+
+            //Handle the last block
+
+            if(byteremainingtoread)
+            {
+              offset = LBAToOffset(cluster);
+              fseek(fp, offset, SEEK_SET);
+              fread(buffer, 1, byteremainingtoread,fp);
+              fwrite(buffer,1,byteremainingtoread,oldpointer);
+
+
+            }
+
+            fclose(oldpointer);
+
+
+
+
+
+  }
+
+
+
+
+
+
+}
+}
+
+
+
+
 int main()
 {
   bool isOpen = false;
@@ -536,8 +626,27 @@ else if (strcmp("stat", token[0]) == 0)
 
   }
 
+else if (strcmp("get", token[0]) == 0)
+  {
+    //int requested_bytes, requested_Offset;
+  
+    if(fp==NULL)
+      {
+        printf("Error: File System Image Not found\n");
 
+      }
+
+    if(fp != NULL)
+    {
+
+     getFile(token[1], token[2]);
+  
+    }
   }
+
+
+
+}
   
   return 0;
 }
