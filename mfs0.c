@@ -130,6 +130,22 @@ int compare(char *user, char *directory)
     return 0;
 }
 
+void ls()
+{
+    int i;
+    for (i = 0; i < 16; i++)
+    {
+        char filename[12];
+        strncpy(filename, Dir[i].DIR_Name, 11);
+        filename[11]='\0';
+        if ((Dir[i].DIR_Attr == ATTR_READ_ONLY || Dir[i].DIR_Attr ==ATTR_DIRECTORY 
+        || Dir[i].DIR_Attr == ATTR_ARCHIVE) && filename[0] != 0xffffffe5)
+        {
+            printf("%s\n", filename );
+        }
+    }
+}
+
 
 int readfile( char *filename, int requested_Offset, int requestedBytes)
 {
@@ -342,7 +358,7 @@ int main()
                 continue;
             }
 
-            else
+            else if (fp == NULL && token_count < 4)
             {
                 if ((fp = fopen(token[1], "r")) == NULL)
                 {
@@ -374,6 +390,12 @@ int main()
                 //printf("%x\n",root);
                 
             }
+
+            else
+            {
+                printf("ERROR: Too many arguments for open command.\n");
+            }
+            
         }
 
         else if (strcmp("close", token[0]) == 0)
@@ -381,7 +403,6 @@ int main()
             if (fp != NULL)
             {
                 fclose(fp);
-                
                 fp = NULL;
             }
 
@@ -424,26 +445,68 @@ int main()
             if(fp == NULL)
             {
                 printf("ERROR: File System image must be opened first.\n");
-
             }
 
             else
             {
-            int i;
-            
-                for (i = 0; i < 16; i++)
+                if (token_count == 2)
                 {
-                    char filename[12];
-                    strncpy(filename, Dir[i].DIR_Name, 11);
-                    filename[11]='\0';
+                    ls();
+                }
 
-                    if ((Dir[i].DIR_Attr == ATTR_READ_ONLY || Dir[i].DIR_Attr ==ATTR_DIRECTORY 
-                    || Dir[i].DIR_Attr == ATTR_ARCHIVE) && filename[0] != 0xffffffe5)
+                else if (token_count == 3)
+                {
+                    if (strcmp(token[1], ".") == 0)
                     {
-                        printf("%s\n", filename );
+                        ls();
                     }
 
+                    else
+                    {
+                        int i;
+                        int got = 0;
+                        struct DirectoryEntry TempDir[16];
+
+                        for (i = 0; i < 16; i++)
+                        {
+                            if(compare(token[1], Dir[i].DIR_Name))
+                            {
+                                int cluster = Dir[i].DIR_FirstClusterLow;
+                                if(cluster == 0)
+                                {
+                                    cluster = 2;
+                                }
+                                int offset = LBAToOffset(cluster);
+                                fseek(fp,offset,SEEK_SET);
+                                fread(TempDir, sizeof(struct DirectoryEntry), 16, fp);
+                                got = 1;
+                                break;
+                            }
+                        }
+
+                        if(!got)
+                        {
+                            printf("Error: Invalid argument for directory with ls command.\n");
+                        }
+
+                        else 
+                        {
+                            for (i = 0; i < 16; i++)
+                            {
+                                char filename[12];
+                                strncpy(filename, TempDir[i].DIR_Name, 11);
+                                filename[11]='\0';
+                                if ((TempDir[i].DIR_Attr == ATTR_READ_ONLY || TempDir[i].DIR_Attr ==ATTR_DIRECTORY 
+                                || TempDir[i].DIR_Attr == ATTR_ARCHIVE) && filename[0] != 0xffffffe5)
+                                {
+                                    printf("%s\n", filename );
+                                }
+
+                            }
+                        }
+                    }
                 }
+                
             }  
 
             
@@ -454,6 +517,11 @@ int main()
             if(fp == NULL)
             {
                 printf("ERROR: File System image must be opened first.\n");
+            }
+
+            else if(fp != NULL && (token_count != 3))
+            {
+                printf("ERRORR: Invalid number of arguments for cd command.\n");
             }
 
             else
@@ -484,6 +552,7 @@ int main()
                     printf("Error: Directory not found\n");
                 }
             }
+            
         }
 
 
@@ -496,9 +565,17 @@ int main()
                 printf("ERROR: File System image must be opened first.\n");
             }
 
-            if(fp != NULL)
+            else
             {
-                readfile( token[1], (int) atoi( token[2] ), (int)atoi( token[3] ));
+                if (token_count < 5)
+                {
+                    printf("Error: Must provide filename, position, and number of bytes to read.\n");
+                }
+
+                else
+                {
+                    readfile( token[1], (int) atoi( token[2] ), (int)atoi( token[3] ));
+                }
             }
         }
 
@@ -509,7 +586,7 @@ int main()
                 printf("ERROR: File System image must be opened first.\n");
             }
 
-            if(fp != NULL)
+            else if (fp != NULL && token_count == 3)
             {
                 int i;
                 int found =0;
@@ -528,6 +605,12 @@ int main()
                     printf("Error: File not found\n");
                 }
             }
+
+            else
+            {
+                printf("ERROR: Invalid number of arguments.\n");
+            }
+            
         }
 
         else if (strcmp("get", token[0]) == 0)
@@ -539,16 +622,26 @@ int main()
                 printf("ERROR: File System image must be opened first.\n");
             }
 
-            if(fp != NULL)
+            else if(fp != NULL && token_count < 5)
             {
                 getFile(token[1], token[2]);
             }
+
+            else
+            {
+                printf("ERROR: Invalid number of arguments.\n");
+            }
+            
         }
 
         else if ((strcmp("quit", token[0]) == 0) || (strcmp("exit", token[0]) == 0))
         {
             printf("Closing the Fat32 System..\n");
-            fp = NULL;
+            if (fp != NULL)
+            {
+                fclose(fp);
+                fp = NULL;
+            }
             break;
         }
     }
