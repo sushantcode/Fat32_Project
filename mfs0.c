@@ -135,7 +135,105 @@ return 0;
 }
 
 
+int readfile( char *filename, int requested_Offset, int requestedBytes)
 
+  {
+      
+      int i;
+      int got=0;
+      int bytesRemainingToRead = requestedBytes;
+      
+      if(requested_Offset < 0)
+      {
+       printf("Error: offset can't be negative\n");
+
+      }
+      for(i=0; i<16; i++)
+      {
+
+        if(compare(filename, Dir[i].DIR_Name ) )
+        {
+          int cluster = Dir[i].DIR_FirstClusterLow;
+            got =1;
+
+            int SearchSize = requested_Offset;
+
+            while(SearchSize >= BPB_BytesPerSec)
+            {
+            
+            cluster = NextLB( cluster );
+            SearchSize = SearchSize - BPB_BytesPerSec;
+
+            }
+
+            int offset = LBAToOffset( cluster );
+            int byteOffset = ( requested_Offset % BPB_BytesPerSec );
+            fseek(fp, offset + byteOffset, SEEK_SET);
+
+            //printf("cluster %d\n", cluster);
+
+            unsigned char buffer [ BPB_BytesPerSec ];
+
+            int firstBlockBytes = BPB_BytesPerSec - requested_Offset;
+
+            fread(buffer,1,firstBlockBytes,fp);
+            //fread(buffer,1,byteOffset,fp);
+
+            for(i=0; i< firstBlockBytes; i++)
+            {
+              printf("%x ", buffer[i]);
+            }
+            
+           bytesRemainingToRead = bytesRemainingToRead - firstBlockBytes;
+
+            while(bytesRemainingToRead >= 512)
+            {
+              cluster = NextLB( cluster );
+              offset = LBAToOffset( cluster );
+              fseek(fp, offset , SEEK_SET);
+              fread(buffer,1,BPB_BytesPerSec,fp);
+
+              for(i=0; i< BPB_BytesPerSec; i++)
+              {
+               printf("%x ", buffer[i]);
+
+              }
+            bytesRemainingToRead = bytesRemainingToRead - BPB_BytesPerSec;
+
+
+
+            }
+
+            if( bytesRemainingToRead)
+            {
+              cluster = NextLB( cluster );
+              offset = LBAToOffset( cluster );
+              fseek(fp,offset, SEEK_SET);
+              fread(buffer,1,bytesRemainingToRead, fp);
+            
+            for(i=0; i< bytesRemainingToRead; i++)
+              {
+               printf("%x ", buffer[i]);
+
+              }
+
+   
+
+            }
+
+
+        printf("\n");
+        }
+      }
+      if(!got)
+      {
+
+        printf("Error: File not found\n");
+        return -1;
+      }
+
+      //return 0;
+    }
 
 int main()
 {
@@ -286,7 +384,7 @@ int main()
     }
 
   else if (strcmp("ls", token[0]) == 0)
-    {
+  {
 
       if(fp==NULL)
       {
@@ -315,17 +413,14 @@ int main()
 
         }
 
-      
-
-
     
     }  
 
     
-  }
+}
 
   else if (strcmp("cd", token[0]) == 0)
-    {
+  {
         if(fp==NULL)
       {
         printf("Error: File System Image Not found\n");
@@ -361,8 +456,6 @@ int main()
       }
       
 
-
-
     }
 
 
@@ -374,8 +467,27 @@ int main()
        
     }
 
-    }
+  }
+
+
+  else if (strcmp("read", token[0]) == 0)
+  {
+    //int requested_bytes, requested_Offset;
+  
+    if(fp==NULL)
+      {
+        printf("Error: File System Image Not found\n");
+
+      }
+
+    if(fp != NULL)
+
+     {
+      readfile( token[1], atoi( token[2] ), atoi( token[4] ));
+     }
+
    
+  }
   }
   
   return 0;
