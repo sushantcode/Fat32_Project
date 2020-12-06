@@ -33,7 +33,7 @@
 #include <ctype.h>
 #include <stdbool.h>
 
-#define MAX_NUM_ARGUMENTS 3
+#define MAX_NUM_ARGUMENTS 10
 
 #define WHITESPACE " \t\n"      // We want to split our command line up into tokens
                                 // so we need to define what delimits our tokens.
@@ -493,7 +493,6 @@ int main()
 
           char filename[12];
 				  strncpy(filename, Dir[i].DIR_Name, 11);
-          //printf("%s\n" , Dir[i].DIR_Name);
           filename[11]='\0';
           if ((Dir[i].DIR_Attr == ATTR_READ_ONLY || Dir[i].DIR_Attr ==ATTR_DIRECTORY 
           || Dir[i].DIR_Attr == ATTR_ARCHIVE) && filename[0] != 0xffffffe5)
@@ -573,7 +572,7 @@ int main()
     if(fp != NULL)
 
      {
-      readfile( token[1], atoi( token[2] ), atoi( token[4] ));
+      readfile( token[1], (int) atoi( token[2] ), (int)atoi( token[3] ));
      }
 
    
