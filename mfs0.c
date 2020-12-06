@@ -341,7 +341,7 @@ int main()
             token[token_count] = strndup( arg_ptr, MAX_COMMAND_SIZE );
             if( strlen( token[token_count] ) == 0 )
             {
-            token[token_count] = NULL;
+                token[token_count] = NULL;
             }
             token_count++;
         }
@@ -608,30 +608,27 @@ int main()
 
             else
             {
-                printf("ERROR: Invalid number of arguments.\n");
+                printf("ERROR: Invalid number of arguments for stat command.\n");
             }
             
         }
 
         else if (strcmp("get", token[0]) == 0)
         {
-            //int requested_bytes, requested_Offset;
-
             if(fp == NULL)
             {
                 printf("ERROR: File System image must be opened first.\n");
             }
 
-            else if(fp != NULL && token_count < 5)
+            else if (fp != NULL && (token_count != 3 || token_count != 4))
             {
-                getFile(token[1], token[2]);
+                printf("ERROR: Invalid number of arguments for get command.\n");
             }
 
             else
             {
-                printf("ERROR: Invalid number of arguments.\n");
+                getFile(token[1], token[2]);
             }
-            
         }
 
         else if ((strcmp("quit", token[0]) == 0) || (strcmp("exit", token[0]) == 0))
@@ -648,4 +645,3 @@ int main()
 
     return 0;
 }
-
