@@ -488,6 +488,55 @@ int main()
 
    
   }
+
+else if (strcmp("stat", token[0]) == 0)
+  {
+    if(fp==NULL)
+      {
+        printf("Error: File System Image Not found\n");
+
+      }
+
+    if(fp != NULL)
+
+     {
+       int i;
+       int found =0;
+
+       for(i=0; i<16; i++)
+       { 
+
+         if(compare((token[1]), Dir[i].DIR_Name))
+         {
+        
+        printf("%s Attr: %d Size: %d Cluster: %d\n", token[1], Dir[i].DIR_Attr,Dir[1].DIR_FileSize,Dir[i].DIR_FirstClusterLow);
+        found=1;
+          
+
+
+         }
+     
+
+
+       }
+
+       if(!found)
+       {
+
+         printf("Error: File not found\n");
+       }
+
+
+
+
+     }
+
+
+
+
+  }
+
+
   }
   
   return 0;
