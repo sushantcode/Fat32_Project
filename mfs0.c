@@ -643,6 +643,12 @@ else if (strcmp("get", token[0]) == 0)
     }
   }
 
+ else if ((strcmp("quit", token[0]) == 0) || (strcmp("exit", token[0]) == 0))
+		{
+      printf("Closing the Fat32 System..\n");
+			return 0;
+		}
+
 
 
 }
