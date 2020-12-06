@@ -438,7 +438,7 @@ int main()
             }
             else
             {
-                printf("Error:“Error: File system not open. \n");
+                printf("Error: File system not open. \n");
             }
         }
 
@@ -478,7 +478,7 @@ int main()
 
       if(fp==NULL)
       {
-        printf("Error: File System Image Not found\n");
+        printf("File system image must be opened first.\n");
 
       }
 
