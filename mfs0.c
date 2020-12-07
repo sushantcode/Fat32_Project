@@ -99,7 +99,7 @@ int compare(char *user, char *directory)
     }
 
     char IMG_Name[12];
-    strncpy(IMG_Name,directory,11);
+    strncpy(IMG_Name, directory, 11);
     IMG_Name[11] = '\0';
     char input[11];
     memset(input, 0, 11);
@@ -232,14 +232,29 @@ int readfile( char *filename, int requested_Offset, int requestedBytes)
 }
 
 
-int getFile(char *olderfilename, char *newfilename)
+void getFile(char *olderfilename, char *newfilename)
 {
 
     FILE *oldpointer;
+    FILE *tempFp = fopen(olderfilename, "r");
+    int check = 0;
+    for (int i = 0; i < 16; i++)
+    {
+        if (compare(olderfilename, Dir[i].DIR_Name ))
+        {
+            check = 1;
+        }
+    }
+
+    if (check == 0)
+    {
+        printf("ERROR: File not found.\n");
+        return;
+    }
 
     if(newfilename == NULL)
     {
-        oldpointer = fopen(olderfilename,"w");
+        oldpointer = fopen(olderfilename, "w");
         if(oldpointer == NULL)
         {
             printf("Error: Cant open new file %s\n", olderfilename);
@@ -247,7 +262,7 @@ int getFile(char *olderfilename, char *newfilename)
     }
     else
     {
-        oldpointer = fopen(newfilename,"w");
+        oldpointer = fopen(newfilename, "w");
 
         if(oldpointer == NULL)
         {
@@ -256,16 +271,16 @@ int getFile(char *olderfilename, char *newfilename)
     }
 
     int i;
-    int got=0;
+    int got = 0;
 
     for(i = 0; i < 16 ; i++)
     {
         if(compare(olderfilename, Dir[i].DIR_Name ) )
         {
             int cluster = Dir[i].DIR_FirstClusterLow;
-            got =1;
+            got = 1;
             int byteremainingtoread = Dir[i].DIR_FileSize;
-            int offset=0;
+            int offset= 0;
             unsigned char buffer[512];
 
             while(byteremainingtoread >= BPB_BytesPerSec)
@@ -620,7 +635,7 @@ int main()
                 printf("ERROR: File System image must be opened first.\n");
             }
 
-            else if (fp != NULL && (token_count != 3 || token_count != 4))
+            else if ((fp != NULL) && (token_count != 3 && token_count != 4))
             {
                 printf("ERROR: Invalid number of arguments for get command.\n");
             }
