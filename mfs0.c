@@ -237,10 +237,13 @@ void getFile(char *olderfilename, char *newfilename)
 
     FILE *oldpointer;
     FILE *tempFp = fopen(olderfilename, "r");
+
+    // Checking if the file or folder already exists or not
+    // if not, the check is updated to 1 and then error is thrown
     int check = 0;
     for (int i = 0; i < 16; i++)
     {
-        if (compare(olderfilename, Dir[i].DIR_Name ))
+        if (compare(olderfilename, Dir[i].DIR_Name ) && strcmp(olderfilename, "..") != 0)
         {
             check = 1;
         }
@@ -464,6 +467,8 @@ int main()
 
             else
             {
+                // if there is only one command without argument, call ls()
+                // also call ls() to print same directory content if first argument if "."
                 if (token_count == 2)
                 {
                     ls();
@@ -480,6 +485,9 @@ int main()
                     {
                         int i;
                         int got = 0;
+
+                        // defining new temprorary directory struct to store details of parent or child
+                        // directory
                         struct DirectoryEntry TempDir[16];
 
                         for (i = 0; i < 16; i++)
@@ -499,11 +507,13 @@ int main()
                             }
                         }
 
+                        // printing error if no any folder is found
                         if(!got)
                         {
                             printf("Error: Invalid argument for directory with ls command.\n");
                         }
 
+                        // else listing the directory content of the argument passed
                         else 
                         {
                             for (i = 0; i < 16; i++)
