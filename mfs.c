@@ -1,5 +1,4 @@
-//Sindhu Parajuli 1001764819
-//Sushant Gupta 1001520302
+
 
 // The MIT License (MIT)
 // 
